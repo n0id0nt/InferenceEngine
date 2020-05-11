@@ -8,9 +8,22 @@ namespace InferenceEngine
 {
     class Program
     {
-        static void ParseFile(string filename, ref KnowledgeBase knowledgeBase, ref Query query)
+        static bool ParseFile(string filename, ref KnowledgeBase knowledgeBase, ref string query)
         {
+            knowledgeBase.AddStatement(new Clause(new string[] { "p2" }, "p3"));
+            knowledgeBase.AddStatement(new Clause(new string[] { "p3" }, "p1"));
+            knowledgeBase.AddStatement(new Clause(new string[] { "c" }, "e"));
+            knowledgeBase.AddStatement(new Clause(new string[] { "b", "e" }, "f"));
+            knowledgeBase.AddStatement(new Clause(new string[] { "f", "g" }, "h"));
+            knowledgeBase.AddStatement(new Clause(new string[] { "p1" }, "d"));
+            knowledgeBase.AddStatement(new Clause(new string[] { "p1", "p3" }, "c"));
+            knowledgeBase.AddStatement(new Clause(null, "a"));
+            knowledgeBase.AddStatement(new Clause(null, "b"));
+            knowledgeBase.AddStatement(new Clause(null, "f"));
 
+            query = "c";
+
+            return true;
         }
 
         static int Main(string[] args)
@@ -25,21 +38,25 @@ namespace InferenceEngine
             string filename = args[1];
 
             KnowledgeBase knowledgeBase = new KnowledgeBase();
-            Query query = new Query();
+            string query = "";
 
-            ParseFile(filename, ref knowledgeBase, ref query);
+            if (!ParseFile(filename, ref knowledgeBase, ref query))
+            {
+                Console.WriteLine("ERROR: incorrect file format");
+                return 3;
+            }
 
             bool result;
             switch (method)
             {
                 case "TT":
-                    result = TruthTableChecking.Equals(knowledgeBase, query);
+                    result = TruthTableChecking.TT(knowledgeBase, query);
                     break;
                 case "FC":
-                    result = TruthTableChecking.Equals(knowledgeBase, query);
+                    result = ForwardChaining.FC(knowledgeBase, query);
                     break;
                 case "BC":
-                    result = TruthTableChecking.Equals(knowledgeBase, query);
+                    result = BackwardChaining.BC(knowledgeBase, query);
                     break;
                 default:
                     Console.WriteLine("ERROR: invalid method provided");
@@ -55,7 +72,7 @@ namespace InferenceEngine
                 Console.WriteLine("No");
             }
 #if DEBUG
-            Console.ReadLine();
+            Console.ReadLine(); //stops the console from closing
 #endif
             return 0;
         }

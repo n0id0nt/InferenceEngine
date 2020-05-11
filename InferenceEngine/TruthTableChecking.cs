@@ -8,7 +8,7 @@ namespace InferenceEngine
 {
     class TruthTableChecking
     {
-        static public bool FC(KnowledgeBase knowledgeBase, Query query)
+        static public bool TT(KnowledgeBase knowledgeBase, string query)
         {
             return false;
         }

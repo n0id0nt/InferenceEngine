@@ -44,11 +44,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BackwardChaining.cs" />
+    <Compile Include="Clause.cs" />
     <Compile Include="ForwardChaining.cs" />
     <Compile Include="KnowledgeBase.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Query.cs" />
     <Compile Include="TruthTableChecking.cs" />
   </ItemGroup>
   <ItemGroup>
