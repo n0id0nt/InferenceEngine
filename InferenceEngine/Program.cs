@@ -46,7 +46,7 @@ namespace InferenceEngine
                 return 3;
             }
 
-            bool result;
+            Result result;
             switch (method)
             {
                 case "TT":
@@ -63,7 +63,7 @@ namespace InferenceEngine
                     return 2;
             }
 
-            if (result)
+            if (result.Success)
             {
                 Console.WriteLine("Yes");
             }

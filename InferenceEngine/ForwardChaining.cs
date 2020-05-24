@@ -8,7 +8,7 @@ namespace InferenceEngine
 {
     class ForwardChaining
     {
-        static public bool FC(KnowledgeBase knowledgeBase, string query)
+        static public Result FC(KnowledgeBase knowledgeBase, string query)
         {
             // count <- a table where count[c] is the number of symbols in c's premis
             Dictionary<Clause, int> count = new Dictionary<Clause, int>();
@@ -34,7 +34,7 @@ namespace InferenceEngine
                 string p = agenda.Dequeue();
                 // if p=q then return true
                 if (p == query)
-                    return true;
+                    return new Result(true);
                 // if inferred[p] = false then
                 if (!inferred[p])
                 {
@@ -52,7 +52,7 @@ namespace InferenceEngine
                 }
             }
 
-            return false;
+            return new Result(false);
         }
     }
 }

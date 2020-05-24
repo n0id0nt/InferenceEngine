@@ -8,12 +8,12 @@ namespace InferenceEngine
 {
     class BackwardChaining
     {
-        static public bool BC(KnowledgeBase knowledgeBase, string query)
+        static public Result BC(KnowledgeBase knowledgeBase, string query)
         {
             return BCRecursive(knowledgeBase, query);
         }
 
-        static private bool BCRecursive(KnowledgeBase knowledgeBase, string target)
+        static private Result BCRecursive(KnowledgeBase knowledgeBase, string target)
         {
             List<Clause> statements = knowledgeBase.InConclusion(target);
 
@@ -22,11 +22,11 @@ namespace InferenceEngine
             {
                 bool result = true;
                 foreach (string s in c.Premise)
-                    result &= BCRecursive(knowledgeBase, s);
+                    result &= BCRecursive(knowledgeBase, s).Success;
                 results.Add(result);
             }
 
-            return results.All(r => r) && results.Count != 0;
+            return new Result(results.All(r => r) && results.Count != 0);
         }
     }
 }
