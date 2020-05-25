@@ -43,7 +43,21 @@ namespace InferenceEngine
 
         static private bool PLTrue(KnowledgeBase knowledgeBase, Dictionary<string, bool> model)
         {
-            return false;
+            bool result = true;
+            foreach(Clause clause in knowledgeBase.Sentences)
+            {
+                bool r = true;
+                foreach(string premise in clause.Premise)
+                {
+                    r &= model[premise];
+                }
+
+                if (r)
+                {
+                    result &= model[clause.Conclusion];
+                }
+            }
+            return result;
         }
     }
 }

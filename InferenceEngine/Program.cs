@@ -19,9 +19,9 @@ namespace InferenceEngine
             knowledgeBase.AddStatement(new Clause(new string[] { "p1", "p3" }, "c"));
             knowledgeBase.AddStatement(new Clause(null, "a"));
             knowledgeBase.AddStatement(new Clause(null, "b"));
-            knowledgeBase.AddStatement(new Clause(null, "f"));
+            knowledgeBase.AddStatement(new Clause(null, "p2"));
 
-            query = "c";
+            query = "d";
 
             return true;
         }
@@ -65,11 +65,11 @@ namespace InferenceEngine
 
             if (result.Success)
             {
-                Console.WriteLine("Yes");
+                Console.WriteLine("YES: {0}", result.Path);
             }
             else
             {
-                Console.WriteLine("No");
+                Console.WriteLine("NO: {0}", result.Path);
             }
 #if DEBUG
             Console.ReadLine(); //stops the console from closing
