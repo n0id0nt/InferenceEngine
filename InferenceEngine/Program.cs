@@ -65,11 +65,16 @@ namespace InferenceEngine
 
             if (result.Success)
             {
-                Console.WriteLine("YES: {0}", result.Path);
+                string second;
+                if (result.Symbols is null)
+                    second = result.Count.ToString();
+                else
+                    second = string.Join(", ", result.Symbols);
+                Console.WriteLine("YES: {0}", second);
             }
             else
             {
-                Console.WriteLine("NO: {0}", result.Path);
+                Console.WriteLine("NO");
             }
 #if DEBUG
             Console.ReadLine(); //stops the console from closing

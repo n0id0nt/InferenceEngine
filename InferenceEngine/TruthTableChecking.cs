@@ -21,7 +21,8 @@ namespace InferenceEngine
                 {
                     KnowledgeBase a = new KnowledgeBase();
                     a.AddStatement(new Clause(null, query));
-                    return new Result(PLTrue(a, model));
+                    bool r = PLTrue(a, model);
+                    return new Result(r, count: 1);
                 }
                 else
                 {
@@ -33,11 +34,16 @@ namespace InferenceEngine
                 List<string> symbolsCopy = symbols.ConvertAll(symbol => String.Copy(symbol));
                 string first = symbolsCopy[0];
                 symbolsCopy.RemoveAt(0);
+
                 Dictionary<string, bool> t = model.ToDictionary(m => m.Key, m => m.Value);
-                t.Add(first, true);
                 Dictionary<string, bool> f = model.ToDictionary(m => m.Key, m => m.Value);
+
+                t.Add(first, true);
                 f.Add(first, false);
-                return new Result(TTCheckAll(knowledgeBase, query, symbolsCopy, t).Success && TTCheckAll(knowledgeBase, query, symbolsCopy, f).Success);
+
+                Result r1 = TTCheckAll(knowledgeBase, query, symbolsCopy, t);
+                Result r2 = TTCheckAll(knowledgeBase, query, symbolsCopy, f);
+                return new Result(r1.Success && r2.Success, count: r1.Count + r2.Count);
             }
         }
 

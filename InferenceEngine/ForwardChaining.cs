@@ -27,14 +27,17 @@ namespace InferenceEngine
             // agenda <- a queue of sumbols, initially symbols known to be true in KB
             Queue<string> agenda = knowledgeBase.InitiallyTrue();
 
+            List<string> symbolsEntailed = new List<string>();
             // while agenda is not empty
             while (agenda.Count != 0)
             {
                 // p <- pop(agenda)
                 string p = agenda.Dequeue();
+                // store the symbols entailed during FC
+                symbolsEntailed.Add(p);
                 // if p=q then return true
                 if (p == query)
-                    return new Result(true);
+                    return new Result(true, symbols: symbolsEntailed);
                 // if inferred[p] = false then
                 if (!inferred[p])
                 {

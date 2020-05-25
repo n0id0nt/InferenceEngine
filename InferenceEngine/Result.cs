@@ -10,12 +10,15 @@ namespace InferenceEngine
     {
         public bool Success { get; }
 
-        public string Path { get; }
+        public List<string> Symbols { get; }
 
-        public Result(bool success, string path = "")
+        public int Count { get; }
+
+        public Result(bool success, List<string> symbols = null, int count = 0)
         {
             Success = success;
-            Path = path;
+            Symbols = symbols;
+            Count = count;
         }
     }
 }

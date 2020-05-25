@@ -16,17 +16,23 @@ namespace InferenceEngine
         static private Result BCRecursive(KnowledgeBase knowledgeBase, string target)
         {
             List<Clause> statements = knowledgeBase.InConclusion(target);
-
+            List<string> symbolsEntailed = new List<string>();
             List<bool> results = new List<bool>();
             foreach (Clause c in statements)
             {
                 bool result = true;
                 foreach (string s in c.Premise)
-                    result &= BCRecursive(knowledgeBase, s).Success;
+                {
+                    Result r = BCRecursive(knowledgeBase, s);
+                    result &= r.Success;
+                    if (r.Success)
+                        symbolsEntailed = r.Symbols;
+                }
                 results.Add(result);
+                symbolsEntailed.Add(c.Conclusion);
             }
 
-            return new Result(results.All(r => r) && results.Count != 0);
+            return new Result(results.All(r => r) && results.Count != 0, symbols: symbolsEntailed);
         }
     }
 }
