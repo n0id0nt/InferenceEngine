@@ -71,7 +71,7 @@ namespace InferenceEngine
 
                 for (int i = 0; i < sentence.Length; i++)
                 {
-                    if (sentence[i].Equals('('))
+                    if (sentence[i].Equals('(')) 
                         parenthesesIndex.Push(i);
                     else if (sentence[i].Equals(')'))
                     {
@@ -80,13 +80,19 @@ namespace InferenceEngine
                             throw new Exception("Parentheses in file do not match");
                         }
 
+                        // copy the inner clause in the sentace
                         string inbedSentence = sentence.Substring(parenthesesIndex.Peek() + 1, i-parenthesesIndex.Peek()-1);
 
+                        // create a unique variable to replace the sentance with
                         string replacementVar = string.Format("*{0}", replacementVarIndex++);
 
+                        // replace the inner clause with a variable
                         sentence = sentence.Replace(string.Format("({0})", inbedSentence), replacementVar);
+
+                        // set the index back to the where the previous parentheses was
                         i = parenthesesIndex.Peek();
 
+                        // add a new sentance to the knoledge base where the variable is equivilent to the replacement variable
                         CreateSentence(ref knowledgeBase, string.Format("{0}<=>{1}", replacementVar, inbedSentence));
 
                         parenthesesIndex.Pop();
@@ -114,6 +120,14 @@ namespace InferenceEngine
                         symbols.Insert(i + 1, symbols[i].Substring(index + connector.Length));
                         symbols[i] = symbols[i].Substring(0, index);
                     }
+                }
+            }
+
+            for (int i = 0; i < symbols.Count; i++)
+            {
+                if (symbols[i] == "" && logic[i] != "~")
+                {
+                    throw new Exception("logical connectives missused");
                 }
             }
 

@@ -10,7 +10,7 @@ namespace InferenceEngine
     {
         static public Result TT(KnowledgeBase knowledgeBase, string query)
         {
-            return TTCheckAll(knowledgeBase, query, knowledgeBase.Symbols, new Dictionary<string, bool> { { "", true } });
+            return TTCheckAll(knowledgeBase, query, knowledgeBase.Symbols, new Dictionary<string, bool> { { "", false } });
         }
 
         static private Result TTCheckAll(KnowledgeBase knowledgeBase, string query, List<string> symbols, Dictionary<string, bool> model)
@@ -54,18 +54,23 @@ namespace InferenceEngine
 
                 for (int i = 0; i < clause.Symbols.Count - 1; i++)
                 {
-                    if (clause.Symbols[i + 1] == "") // means not symbol
-                    {
-                        innerResult = LogicalConnectives.Evaluate(clause.LogicalConnectives[i], innerResult, LogicalConnectives.Evaluate(clause.LogicalConnectives[i+1], innerResult, model[clause.Symbols[i + 2]]));
-                        i++;
-                    }
-                    else
-                    {
-                        innerResult = LogicalConnectives.Evaluate(clause.LogicalConnectives[i], innerResult, model[clause.Symbols[i + 1]]);
-                    }
+                    innerResult = Evaluate(ref i, innerResult, clause, model);
                 }
 
                 result &= innerResult;
+            }
+            return result;
+        }
+
+        static private bool Evaluate(ref int index, bool result, Clause clause, Dictionary<string, bool> model)
+        {
+            if (clause.Symbols[index + 1] == "") // means not symbol
+            {
+                result = LogicalConnectives.Evaluate(clause.LogicalConnectives[index++], result, Evaluate(ref index, result, clause, model));
+            }
+            else
+            {
+                result = LogicalConnectives.Evaluate(clause.LogicalConnectives[index], result, model[clause.Symbols[index + 1]]);
             }
             return result;
         }

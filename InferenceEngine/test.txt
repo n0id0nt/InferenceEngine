@@ -1,4 +1,4 @@
 TELL
-b&~a=>c; c||~b<=>a; b; (b&(a||c))&(a&b);
+~c<=>~~~~~c; c;
 ASK
 c
