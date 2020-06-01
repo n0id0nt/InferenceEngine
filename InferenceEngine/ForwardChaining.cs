@@ -34,7 +34,8 @@ namespace InferenceEngine
                 // p <- pop(agenda)
                 string p = agenda.Dequeue();
                 // store the symbols entailed during FC
-                symbolsEntailed.Add(p);
+                if (!symbolsEntailed.Contains(p))
+                    symbolsEntailed.Add(p);
                 // if p=q then return true
                 if (p == query)
                     return new Result(true, symbols: symbolsEntailed);

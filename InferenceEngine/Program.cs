@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,20 +11,47 @@ namespace InferenceEngine
     {
         static bool ParseFile(string filename, ref KnowledgeBase knowledgeBase, ref string query)
         {
-            knowledgeBase.AddStatement(new Clause(new string[] { "p2" }, "p3"));
-            knowledgeBase.AddStatement(new Clause(new string[] { "p3" }, "p1"));
-            knowledgeBase.AddStatement(new Clause(new string[] { "c" }, "e"));
-            knowledgeBase.AddStatement(new Clause(new string[] { "b", "e" }, "f"));
-            knowledgeBase.AddStatement(new Clause(new string[] { "f", "g" }, "h"));
-            knowledgeBase.AddStatement(new Clause(new string[] { "p1" }, "d"));
-            knowledgeBase.AddStatement(new Clause(new string[] { "p1", "p3" }, "c"));
-            knowledgeBase.AddStatement(new Clause(null, "a"));
-            knowledgeBase.AddStatement(new Clause(null, "b"));
-            knowledgeBase.AddStatement(new Clause(null, "p2"));
+            // indicate if the file is complete
+            bool tell = false;
+            bool ask = false;
 
-            query = "d";
+            StreamReader reader = new StreamReader(filename);
 
-            return true;
+            string line;
+
+            while ((line = reader.ReadLine()) != null)
+            {
+                // read the knowledgeBase
+                if (line.Trim().Equals("TELL"))
+                {
+                    tell = true;
+                    if ((line = reader.ReadLine().Replace(" ", "")) != null)
+                    {
+                        string[] sentences = line.Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries);
+                        foreach (string sentence in sentences)
+                        {
+                            List<string> statements = sentence.Split(new string[] { "&", "=>" }, StringSplitOptions.RemoveEmptyEntries).ToList();
+                            string conclustion = statements.Last();
+                            statements.Remove(conclustion);
+                            knowledgeBase.AddStatement(new Clause(statements.ToArray(), conclustion));
+                        }
+                    }
+                    else
+                        return false;
+                }
+
+                // read the query
+                if (line.Trim().Equals("ASK"))
+                {
+                    ask = true;
+                    if ((line = reader.ReadLine()) != null)
+                        query = line.Trim();
+                    else
+                        return false;
+                }
+            }
+
+            return ask && tell;
         }
 
         static int Main(string[] args)

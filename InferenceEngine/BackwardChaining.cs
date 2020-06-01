@@ -29,7 +29,8 @@ namespace InferenceEngine
                         symbolsEntailed = r.Symbols;
                 }
                 results.Add(result);
-                symbolsEntailed.Add(c.Conclusion);
+                if (!symbolsEntailed.Contains(c.Conclusion))
+                    symbolsEntailed.Add(c.Conclusion);
             }
 
             return new Result(results.All(r => r) && results.Count != 0, symbols: symbolsEntailed);
