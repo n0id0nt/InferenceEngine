@@ -17,14 +17,20 @@ namespace InferenceEngine
             Symbols = new List<string>();
         }
 
+        /// <summary>
+        /// create a knowledge base with a single query
+        /// </summary>
+        /// <param name="query"></param>
+        public KnowledgeBase(string query) : this()
+        {
+            AddStatement(new Clause(new List<string> { query }, new List<string>()));
+        }
+
         public void AddStatement(Clause clause)
         {
             Sentences.Add(clause);
-            if (!Symbols.Contains(clause.Conclusion))
-                Symbols.Add(clause.Conclusion);
-
-            foreach (string l in clause.Premise)
-                if (!Symbols.Contains(l))
+            foreach (string l in clause.Symbols)
+                if (!Symbols.Contains(l) && l != "")
                     Symbols.Add(l);
         }
 

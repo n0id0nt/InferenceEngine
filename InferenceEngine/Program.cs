@@ -30,10 +30,28 @@ namespace InferenceEngine
                         string[] sentences = line.Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries);
                         foreach (string sentence in sentences)
                         {
-                            List<string> statements = sentence.Split(new string[] { "&", "=>" }, StringSplitOptions.RemoveEmptyEntries).ToList();
-                            string conclustion = statements.Last();
-                            statements.Remove(conclustion);
-                            knowledgeBase.AddStatement(new Clause(statements.ToArray(), conclustion));
+                            List<string> symbols = new List<string> {sentence};
+                            List<string> logic = new List<string>();
+
+
+
+
+                            foreach (string connector in LogicalConnectives.Symbols)
+                            {
+                                for (int i = 0; i < symbols.Count; i++)
+                                {
+                                    if (symbols[i].Contains(connector))
+                                    {
+                                        logic.Insert(i, connector);
+                                        int index = symbols[i].IndexOf(connector);
+
+                                        symbols.Insert(i + 1, symbols[i].Substring(index + connector.Length));
+                                        symbols[i] = symbols[i].Substring(0, index);
+                                    }
+                                }
+                            }
+
+                            knowledgeBase.AddStatement(new Clause(symbols, logic));
                         }
                     }
                     else
@@ -50,6 +68,8 @@ namespace InferenceEngine
                         return false;
                 }
             }
+
+            reader.Close();
 
             return ask && tell;
         }

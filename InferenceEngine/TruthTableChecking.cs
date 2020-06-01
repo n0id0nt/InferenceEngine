@@ -10,7 +10,7 @@ namespace InferenceEngine
     {
         static public Result TT(KnowledgeBase knowledgeBase, string query)
         {
-            return TTCheckAll(knowledgeBase, query, knowledgeBase.Symbols, new Dictionary<string, bool>());
+            return TTCheckAll(knowledgeBase, query, knowledgeBase.Symbols, new Dictionary<string, bool> { { "", true } });
         }
 
         static private Result TTCheckAll(KnowledgeBase knowledgeBase, string query, List<string> symbols, Dictionary<string, bool> model)
@@ -19,10 +19,8 @@ namespace InferenceEngine
             {
                 if (PLTrue(knowledgeBase, model))
                 {
-                    KnowledgeBase a = new KnowledgeBase();
-                    a.AddStatement(new Clause(null, query));
-                    bool r = PLTrue(a, model);
-                    return new Result(r, count: 1);
+                    bool result = PLTrue(new KnowledgeBase(query), model);
+                    return new Result(result, count: 1);
                 }
                 else
                 {
@@ -52,16 +50,22 @@ namespace InferenceEngine
             bool result = true;
             foreach(Clause clause in knowledgeBase.Sentences)
             {
-                bool r = true;
-                foreach(string premise in clause.Premise)
+                bool innerResult = model[clause.Symbols[0]];
+
+                for (int i = 0; i < clause.Symbols.Count - 1; i++)
                 {
-                    r &= model[premise];
+                    if (clause.Symbols[i + 1] == "") // means not symbol
+                    {
+                        innerResult = LogicalConnectives.Evaluate(clause.LogicalConnectives[i], innerResult, LogicalConnectives.Evaluate(clause.LogicalConnectives[i+1], innerResult, model[clause.Symbols[i + 2]]));
+                        i++;
+                    }
+                    else
+                    {
+                        innerResult = LogicalConnectives.Evaluate(clause.LogicalConnectives[i], innerResult, model[clause.Symbols[i + 1]]);
+                    }
                 }
 
-                if (r)
-                {
-                    result &= model[clause.Conclusion];
-                }
+                result &= innerResult;
             }
             return result;
         }

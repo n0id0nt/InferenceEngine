@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,18 +9,53 @@ namespace InferenceEngine
 {
     class Clause
     {
-        public string Conclusion { get; set; }
-        public List<string> Premise { get; set; }
+        public List<string> Symbols { get; private set; }
 
-        public Clause(string[] premise, string conclusion)
+        public List<string> LogicalConnectives { get; private set; }
+
+        public bool IsHornClause { get; }
+
+        public List<string> Premise { get; private set; }
+
+        public string Conclusion { get; private set; }
+
+        public Clause(List<string> symbols, List<string> logicalConnectives)
         {
-            Premise = new List<string>();
+            Symbols = symbols;
+            LogicalConnectives = logicalConnectives;
 
-            if (premise is string[])
-                foreach (string l in premise)
-                    Premise.Add(l);
+            Debug.Assert(symbols.Count == logicalConnectives.Count + 1);
 
-            Conclusion = conclusion;
+            IsHornClause = false;
+            Premise = null;
+            Conclusion = null;
+
+            // test if horn clause
+            if (LogicalConnectives.Count == 0)
+            {
+                IsHornClause = true;
+                Conclusion = Symbols[0];
+                Premise = new List<string>();
+            }
+            else if (LogicalConnectives.Last() == "=>")
+            {
+                IsHornClause = true;
+                for (UInt16 i = 0; i < LogicalConnectives.Count - 1; i++)
+                {
+                    if (!LogicalConnectives[i].Equals("&"))
+                    {
+                        IsHornClause = false;
+                        break;
+                    }
+                }
+
+                if (IsHornClause)
+                {
+                    Conclusion = Symbols.Last();
+                    Premise = symbols.ConvertAll(symbol => String.Copy(symbol));
+                    Premise.Remove(Conclusion);
+                }
+            }
         }
     }
 }
