@@ -10,6 +10,10 @@ namespace InferenceEngine
     {
         static public Result FC(KnowledgeBase knowledgeBase, string query)
         {
+            if (!knowledgeBase.IsHornClause)
+            {
+                throw new Exception("KnowledgeBase must be Horn clause");
+            }
             // count <- a table where count[c] is the number of symbols in c's premis
             Dictionary<Clause, int> count = new Dictionary<Clause, int>();
             foreach (Clause c in knowledgeBase.Sentences)

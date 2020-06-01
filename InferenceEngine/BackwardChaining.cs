@@ -10,6 +10,10 @@ namespace InferenceEngine
     {
         static public Result BC(KnowledgeBase knowledgeBase, string query)
         {
+            if (!knowledgeBase.IsHornClause)
+            {
+                throw new Exception("KnowledgeBase must be Horn clause");
+            }
             return BCRecursive(knowledgeBase, query);
         }
 

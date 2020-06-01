@@ -11,6 +11,11 @@ namespace InferenceEngine
         public List<Clause> Sentences { get; private set; }
         public List<string> Symbols { get; private set; }
 
+        public bool IsHornClause { get
+            {
+                return Sentences.All(s => s.IsHornClause == true);
+            } }
+
         public KnowledgeBase()
         {
             Sentences = new List<Clause>();

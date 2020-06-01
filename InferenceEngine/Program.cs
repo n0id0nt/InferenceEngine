@@ -9,7 +9,9 @@ namespace InferenceEngine
 {
     class Program
     {
-        static bool ParseFile(string filename, ref KnowledgeBase knowledgeBase, ref string query)
+        private static int replacementVarIndex = 1;
+
+        private static bool ParseFile(string filename, ref KnowledgeBase knowledgeBase, ref string query)
         {
             // indicate if the file is complete
             bool tell = false;
@@ -30,28 +32,14 @@ namespace InferenceEngine
                         string[] sentences = line.Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries);
                         foreach (string sentence in sentences)
                         {
-                            List<string> symbols = new List<string> {sentence};
-                            List<string> logic = new List<string>();
-
-
-
-
-                            foreach (string connector in LogicalConnectives.Symbols)
+                            try
                             {
-                                for (int i = 0; i < symbols.Count; i++)
-                                {
-                                    if (symbols[i].Contains(connector))
-                                    {
-                                        logic.Insert(i, connector);
-                                        int index = symbols[i].IndexOf(connector);
-
-                                        symbols.Insert(i + 1, symbols[i].Substring(index + connector.Length));
-                                        symbols[i] = symbols[i].Substring(0, index);
-                                    }
-                                }
+                                CreateSentence(ref knowledgeBase, sentence);
                             }
-
-                            knowledgeBase.AddStatement(new Clause(symbols, logic));
+                            catch (Exception ex)
+                            {
+                                return false;
+                            }
                         }
                     }
                     else
@@ -74,11 +62,72 @@ namespace InferenceEngine
             return ask && tell;
         }
 
+        private static void CreateSentence(ref KnowledgeBase knowledgeBase, string sentence)
+        {
+            // handle parentheses
+            if (sentence.Contains('(') || sentence.Contains(')'))
+            {
+                Stack<int> parenthesesIndex = new Stack<int>();
+
+                for (int i = 0; i < sentence.Length; i++)
+                {
+                    if (sentence[i].Equals('('))
+                        parenthesesIndex.Push(i);
+                    else if (sentence[i].Equals(')'))
+                    {
+                        if (parenthesesIndex.Count == 0)
+                        {
+                            throw new Exception("Parentheses in file do not match");
+                        }
+
+                        string inbedSentence = sentence.Substring(parenthesesIndex.Peek() + 1, i-parenthesesIndex.Peek()-1);
+
+                        string replacementVar = string.Format("*{0}", replacementVarIndex++);
+
+                        sentence = sentence.Replace(string.Format("({0})", inbedSentence), replacementVar);
+                        i = parenthesesIndex.Peek();
+
+                        CreateSentence(ref knowledgeBase, string.Format("{0}<=>{1}", replacementVar, inbedSentence));
+
+                        parenthesesIndex.Pop();
+                    }
+                }
+
+                if (parenthesesIndex.Count != 0)
+                {
+                    throw new Exception("Parentheses in file do not match");
+                }
+            }
+
+            List<string> symbols = new List<string> { sentence };
+            List<string> logic = new List<string>();
+
+            foreach (string connector in LogicalConnectives.Symbols)
+            {
+                for (int i = 0; i < symbols.Count; i++)
+                {
+                    if (symbols[i].Contains(connector))
+                    {
+                        logic.Insert(i, connector);
+                        int index = symbols[i].IndexOf(connector);
+
+                        symbols.Insert(i + 1, symbols[i].Substring(index + connector.Length));
+                        symbols[i] = symbols[i].Substring(0, index);
+                    }
+                }
+            }
+
+            knowledgeBase.AddStatement(new Clause(symbols, logic));
+        }
+
         static int Main(string[] args)
         {
             if (args.Count() != 2)
             {
                 Console.WriteLine("ERROR: incorrect arguments");
+#if DEBUG
+                Console.ReadLine(); //stops the console from closing
+#endif
                 return 1;
             }
 
@@ -91,24 +140,38 @@ namespace InferenceEngine
             if (!ParseFile(filename, ref knowledgeBase, ref query))
             {
                 Console.WriteLine("ERROR: incorrect file format");
+#if DEBUG
+                Console.ReadLine(); //stops the console from closing
+#endif
                 return 3;
             }
 
             Result result;
-            switch (method)
+            try
             {
-                case "TT":
-                    result = TruthTableChecking.TT(knowledgeBase, query);
-                    break;
-                case "FC":
-                    result = ForwardChaining.FC(knowledgeBase, query);
-                    break;
-                case "BC":
-                    result = BackwardChaining.BC(knowledgeBase, query);
-                    break;
-                default:
-                    Console.WriteLine("ERROR: invalid method provided");
-                    return 2;
+                switch (method)
+                {
+                    case "TT":
+                        result = TruthTableChecking.TT(knowledgeBase, query);
+                        break;
+                    case "FC":
+                        result = ForwardChaining.FC(knowledgeBase, query);
+                        break;
+                    case "BC":
+                        result = BackwardChaining.BC(knowledgeBase, query);
+                        break;
+                    default:
+                        Console.WriteLine("ERROR: invalid method provided");
+#if DEBUG
+                        Console.ReadLine(); //stops the console from closing
+#endif
+                        return 2;
+                }
+            }
+            catch(System.Exception ex)
+            {
+                Console.WriteLine("ERROR: {0}", ex.Message);
+                return 4;
             }
 
             if (result.Success)
