@@ -16,7 +16,6 @@ namespace InferenceEngine
             // indicate if the file is complete
             bool tell = false;
             bool ask = false;
-
             StreamReader reader = new StreamReader(filename);
 
             string line;
@@ -32,14 +31,7 @@ namespace InferenceEngine
                         string[] sentences = line.Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries);
                         foreach (string sentence in sentences)
                         {
-                            try
-                            {
-                                CreateSentence(ref knowledgeBase, sentence);
-                            }
-                            catch (Exception ex)
-                            {
-                                return false;
-                            }
+                            CreateSentence(ref knowledgeBase, sentence);
                         }
                     }
                     else
@@ -151,9 +143,20 @@ namespace InferenceEngine
             KnowledgeBase knowledgeBase = new KnowledgeBase();
             string query = "";
 
-            if (!ParseFile(filename, ref knowledgeBase, ref query))
+            try
             {
-                Console.WriteLine("ERROR: incorrect file format");
+                if (!ParseFile(filename, ref knowledgeBase, ref query))
+                {
+                    Console.WriteLine("ERROR: incorrect file format");
+#if DEBUG
+                    Console.ReadLine(); //stops the console from closing
+#endif
+                    return 3;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("ERROR: {0}", ex.Message);
 #if DEBUG
                 Console.ReadLine(); //stops the console from closing
 #endif

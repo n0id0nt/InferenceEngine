@@ -43,18 +43,29 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BackwardChaining.cs" />
-    <Compile Include="Clause.cs" />
-    <Compile Include="ForwardChaining.cs" />
-    <Compile Include="KnowledgeBase.cs" />
-    <Compile Include="Program.cs" />
+    <Compile Include="src\BackwardChaining.cs" />
+    <Compile Include="src\Clause.cs" />
+    <Compile Include="src\ForwardChaining.cs" />
+    <Compile Include="src\KnowledgeBase.cs" />
+    <Compile Include="src\Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Result.cs" />
-    <Compile Include="LogicalConnectives.cs" />
-    <Compile Include="TruthTableChecking.cs" />
+    <Compile Include="src\Result.cs" />
+    <Compile Include="src\LogicalConnectives.cs" />
+    <Compile Include="src\TruthTableChecking.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="iengine.bat" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="KnoledgeBase\test2.txt" />
+    <Content Include="KnoledgeBase\test4.txt" />
+    <Content Include="KnoledgeBase\test1 - Copy %284%29.txt" />
+    <Content Include="KnoledgeBase\test1 - Copy %285%29.txt" />
+    <Content Include="KnoledgeBase\test3.txt" />
+    <Content Include="KnoledgeBase\test1.txt" />
+    <Content Include="KnoledgeBase\test_genericKB.txt" />
+    <Content Include="KnoledgeBase\test_HornKB.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

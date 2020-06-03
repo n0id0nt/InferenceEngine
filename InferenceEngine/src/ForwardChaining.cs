@@ -21,7 +21,7 @@ namespace InferenceEngine
                 count.Add(c, c.Premise.Count);
             }
 
-            // inferred <- a table, where inferred[s] is initiall false for all symbols
+            // inferred <- a table, where inferred[s] is initially false for all symbols
             Dictionary<string, bool> inferred = new Dictionary<string, bool>();
             foreach (string s in knowledgeBase.Symbols)
             {
