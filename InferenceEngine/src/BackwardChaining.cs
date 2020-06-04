@@ -10,19 +10,19 @@ namespace InferenceEngine
     {
         static public Result BC(KnowledgeBase knowledgeBase, string query)
         {
-            if (!knowledgeBase.IsHornClause)
+            if (!knowledgeBase.IsHornSenctence)
             {
-                throw new Exception("KnowledgeBase must be Horn clause");
+                throw new Exception("KnowledgeBase must be Horn Senctence");
             }
             return BCRecursive(knowledgeBase, query);
         }
 
         static private Result BCRecursive(KnowledgeBase knowledgeBase, string target)
         {
-            List<Clause> statements = knowledgeBase.InConclusion(target);
+            List<Senctence> statements = knowledgeBase.InConclusion(target);
             List<string> symbolsEntailed = new List<string>();
             List<bool> results = new List<bool>();
-            foreach (Clause c in statements)
+            foreach (Senctence c in statements)
             {
                 bool result = true;
                 foreach (string s in c.Premise)

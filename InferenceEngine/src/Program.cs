@@ -72,13 +72,13 @@ namespace InferenceEngine
                             throw new Exception("Parentheses in file do not match");
                         }
 
-                        // copy the inner clause in the sentace
+                        // copy the inner Senctence in the sentace
                         string inbedSentence = sentence.Substring(parenthesesIndex.Peek() + 1, i-parenthesesIndex.Peek()-1);
 
                         // create a unique variable to replace the sentance with
                         string replacementVar = string.Format("*{0}", replacementVarIndex++);
 
-                        // replace the inner clause with a variable
+                        // replace the inner Senctence with a variable
                         sentence = sentence.Replace(string.Format("({0})", inbedSentence), replacementVar);
 
                         // set the index back to the where the previous parentheses was
@@ -123,7 +123,7 @@ namespace InferenceEngine
                 }
             }
 
-            knowledgeBase.AddStatement(new Clause(symbols, logic));
+            knowledgeBase.AddStatement(new Senctence(symbols, logic));
         }
 
         static int Main(string[] args)

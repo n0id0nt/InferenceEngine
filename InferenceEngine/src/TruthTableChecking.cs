@@ -48,13 +48,13 @@ namespace InferenceEngine
         static private bool PLTrue(KnowledgeBase knowledgeBase, Dictionary<string, bool> model)
         {
             bool result = true;
-            foreach(Clause clause in knowledgeBase.Sentences)
+            foreach(Senctence Senctence in knowledgeBase.Sentences)
             {
-                bool innerResult = model[clause.Symbols[0]];
+                bool innerResult = model[Senctence.Symbols[0]];
 
-                for (int i = 0; i < clause.Symbols.Count - 1; i++)
+                for (int i = 0; i < Senctence.Symbols.Count - 1; i++)
                 {
-                    innerResult = Evaluate(ref i, innerResult, clause, model);
+                    innerResult = Evaluate(ref i, innerResult, Senctence, model);
                 }
 
                 result &= innerResult;
@@ -62,15 +62,15 @@ namespace InferenceEngine
             return result;
         }
 
-        static private bool Evaluate(ref int index, bool result, Clause clause, Dictionary<string, bool> model)
+        static private bool Evaluate(ref int index, bool result, Senctence Senctence, Dictionary<string, bool> model)
         {
-            if (clause.Symbols[index + 1] == "") // means not symbol
+            if (Senctence.Symbols[index + 1] == "") // means not symbol
             {
-                result = LogicalConnectives.Evaluate(clause.LogicalConnectives[index++], result, Evaluate(ref index, result, clause, model));
+                result = LogicalConnectives.Evaluate(Senctence.LogicalConnectives[index++], result, Evaluate(ref index, result, Senctence, model));
             }
             else
             {
-                result = LogicalConnectives.Evaluate(clause.LogicalConnectives[index], result, model[clause.Symbols[index + 1]]);
+                result = LogicalConnectives.Evaluate(Senctence.LogicalConnectives[index], result, model[Senctence.Symbols[index + 1]]);
             }
             return result;
         }

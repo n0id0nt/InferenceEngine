@@ -8,17 +8,17 @@ namespace InferenceEngine
 {
     class KnowledgeBase
     {
-        public List<Clause> Sentences { get; private set; }
+        public List<Senctence> Sentences { get; private set; }
         public List<string> Symbols { get; private set; }
 
-        public bool IsHornClause { get
+        public bool IsHornSenctence { get
             {
-                return Sentences.All(s => s.IsHornClause == true);
+                return Sentences.All(s => s.IsHornSenctence == true);
             } }
 
         public KnowledgeBase()
         {
-            Sentences = new List<Clause>();
+            Sentences = new List<Senctence>();
             Symbols = new List<string>();
         }
 
@@ -28,13 +28,13 @@ namespace InferenceEngine
         /// <param name="query"></param>
         public KnowledgeBase(string query) : this()
         {
-            AddStatement(new Clause(new List<string> { query }, new List<string>()));
+            AddStatement(new Senctence(new List<string> { query }, new List<string>()));
         }
 
-        public void AddStatement(Clause clause)
+        public void AddStatement(Senctence Senctence)
         {
-            Sentences.Add(clause);
-            foreach (string l in clause.Symbols)
+            Sentences.Add(Senctence);
+            foreach (string l in Senctence.Symbols)
                 if (!Symbols.Contains(l) && l != "")
                     Symbols.Add(l);
         }
@@ -42,26 +42,26 @@ namespace InferenceEngine
         public Queue<string> InitiallyTrue()
         {
             Queue<string> i = new Queue<string>();
-            foreach (Clause l in Sentences)
+            foreach (Senctence l in Sentences)
                 if (l.Premise.Count == 0)
                     i.Enqueue(l.Conclusion);
 
             return i;
         }
 
-        public List<Clause> InPremise(string value)
+        public List<Senctence> InPremise(string value)
         {
-            List<Clause> l = new List<Clause>();
-            foreach (Clause c in Sentences)
+            List<Senctence> l = new List<Senctence>();
+            foreach (Senctence c in Sentences)
                 if (c.Premise.Contains(value))
                     l.Add(c);
             return l;
         }
 
-        public List<Clause> InConclusion(string value)
+        public List<Senctence> InConclusion(string value)
         {
-            List<Clause> l = new List<Clause>();
-            foreach (Clause c in Sentences)
+            List<Senctence> l = new List<Senctence>();
+            foreach (Senctence c in Sentences)
                 if (c.Conclusion.Equals(value))
                     l.Add(c);
             return l;

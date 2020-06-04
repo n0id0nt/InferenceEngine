@@ -7,49 +7,49 @@ using System.Threading.Tasks;
 
 namespace InferenceEngine
 {
-    class Clause
+    class Senctence
     {
         public List<string> Symbols { get; private set; }
 
         public List<string> LogicalConnectives { get; private set; }
 
-        public bool IsHornClause { get; }
+        public bool IsHornSenctence { get; }
 
         public List<string> Premise { get; private set; }
 
         public string Conclusion { get; private set; }
 
-        public Clause(List<string> symbols, List<string> logicalConnectives)
+        public Senctence(List<string> symbols, List<string> logicalConnectives)
         {
             Symbols = symbols;
             LogicalConnectives = logicalConnectives;
 
             Debug.Assert(symbols.Count == logicalConnectives.Count + 1);
 
-            IsHornClause = false;
+            IsHornSenctence = false;
             Premise = null;
             Conclusion = null;
 
-            // test if horn clause
+            // test if horn Senctence
             if (LogicalConnectives.Count == 0)
             {
-                IsHornClause = true;
+                IsHornSenctence = true;
                 Conclusion = Symbols[0];
                 Premise = new List<string>();
             }
             else if (LogicalConnectives.Last() == "=>")
             {
-                IsHornClause = true;
+                IsHornSenctence = true;
                 for (UInt16 i = 0; i < LogicalConnectives.Count - 1; i++)
                 {
                     if (!LogicalConnectives[i].Equals("&"))
                     {
-                        IsHornClause = false;
+                        IsHornSenctence = false;
                         break;
                     }
                 }
 
-                if (IsHornClause)
+                if (IsHornSenctence)
                 {
                     Conclusion = Symbols.Last();
                     Premise = symbols.ConvertAll(symbol => String.Copy(symbol));
