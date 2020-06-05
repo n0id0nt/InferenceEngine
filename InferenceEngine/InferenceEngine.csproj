@@ -44,6 +44,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="src\BackwardChaining.cs" />
+    <Compile Include="src\DPLL.cs" />
     <Compile Include="src\ForwardChaining.cs" />
     <Compile Include="src\KnowledgeBase.cs" />
     <Compile Include="src\Program.cs" />
@@ -58,12 +59,23 @@
     <None Include="iengine.bat" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="KnoledgeBase\GKBtest1.txt" />
+    <Content Include="KnoledgeBase\GKBtest2.txt" />
+    <Content Include="KnoledgeBase\GKBtest3.txt" />
+    <Content Include="KnoledgeBase\GKBtest4.txt" />
+    <Content Include="KnoledgeBase\GKBtest5.txt" />
+    <Content Include="KnoledgeBase\GKBtest6.txt" />
+    <Content Include="KnoledgeBase\GKBtest7.txt" />
+    <Content Include="KnoledgeBase\test10.txt" />
     <Content Include="KnoledgeBase\test2.txt" />
     <Content Include="KnoledgeBase\test4.txt" />
-    <Content Include="KnoledgeBase\test1 - Copy %284%29.txt" />
-    <Content Include="KnoledgeBase\test1 - Copy %285%29.txt" />
+    <Content Include="KnoledgeBase\test6.txt" />
+    <Content Include="KnoledgeBase\test5.txt" />
     <Content Include="KnoledgeBase\test3.txt" />
     <Content Include="KnoledgeBase\test1.txt" />
+    <Content Include="KnoledgeBase\test7.txt" />
+    <Content Include="KnoledgeBase\test8.txt" />
+    <Content Include="KnoledgeBase\test9.txt" />
     <Content Include="KnoledgeBase\test_genericKB.txt" />
     <Content Include="KnoledgeBase\test_HornKB.txt" />
   </ItemGroup>

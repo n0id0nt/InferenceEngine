@@ -19,38 +19,64 @@ namespace InferenceEngine
             StreamReader reader = new StreamReader(filename);
 
             string line;
-
+            string ReadState = "";
             while ((line = reader.ReadLine()) != null)
             {
                 // read the knowledgeBase
                 if (line.Trim().Equals("TELL"))
+                    ReadState = "TELL";
+
+                else if (line.Trim().Equals("ASK"))
                 {
-                    tell = true;
-                    if ((line = reader.ReadLine().Replace(" ", "")) != null)
+                    // can only be one ask statement
+                    if (!ask)
+                        ReadState = "ASK";
+                    else // there is already a query error in the file 
                     {
-                        string[] sentences = line.Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries);
-                        foreach (string sentence in sentences)
-                        {
-                            CreateSentence(ref knowledgeBase, sentence);
-                        }
+                        ask = false;
+                        break;
                     }
-                    else
-                        return false;
                 }
 
-                // read the query
-                if (line.Trim().Equals("ASK"))
+                else if (ReadState.Equals("TELL"))
                 {
-                    ask = true;
-                    if ((line = reader.ReadLine()) != null)
-                        query = line.Trim();
-                    else
-                        return false;
+                    tell = true;
+
+                    // remove spaces form the line
+                    line = line.Replace(" ", "");
+
+                    // create an array of sentances
+                    string[] sentences = line.Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries);
+
+                    // add each sentance to the knowledge base
+                    foreach (string sentence in sentences)
+                    {
+                        CreateSentence(ref knowledgeBase, sentence);
+                    }
+                }
+
+                else if (ReadState.Equals("ASK"))
+                {
+                    if (line != "")
+                    {
+                        if (!ask)
+                        {
+                            query = line.Trim();
+                            ask = true;
+                        }
+                        else // there is already a query error in the file 
+                        {
+                            ask = false;
+                            break;
+                        }
+                    }
                 }
             }
+                        
 
             reader.Close();
 
+            // ensure that query is in the knowledge base and there is only one ask statment
             return ask && tell;
         }
 
@@ -72,20 +98,20 @@ namespace InferenceEngine
                             throw new Exception("Parentheses in file do not match");
                         }
 
-                        // copy the inner Senctence in the sentace
+                        // copy the inner Sentence in the sentace
                         string inbedSentence = sentence.Substring(parenthesesIndex.Peek() + 1, i-parenthesesIndex.Peek()-1);
 
                         // create a unique variable to replace the sentance with
                         string replacementVar = string.Format("*{0}", replacementVarIndex++);
 
-                        // replace the inner Senctence with a variable
+                        // replace the inner Sentence with a variable
                         sentence = sentence.Replace(string.Format("({0})", inbedSentence), replacementVar);
 
                         // set the index back to the where the previous parentheses was
                         i = parenthesesIndex.Peek();
 
                         // add a new sentance to the knoledge base where the variable is equivilent to the replacement variable
-                        CreateSentence(ref knowledgeBase, string.Format("{0}<=>{1}", replacementVar, inbedSentence));
+                        CreateSentence(ref knowledgeBase, string.Format("{0}<=>{1}", inbedSentence, replacementVar));
 
                         parenthesesIndex.Pop();
                     }
@@ -123,7 +149,7 @@ namespace InferenceEngine
                 }
             }
 
-            knowledgeBase.AddStatement(new Senctence(symbols, logic));
+            knowledgeBase.AddStatement(new Sentence(symbols, logic));
         }
 
         static int Main(string[] args)
@@ -151,7 +177,7 @@ namespace InferenceEngine
 #if DEBUG
                     Console.ReadLine(); //stops the console from closing
 #endif
-                    return 3;
+                    return 2;
                 }
             }
             catch (Exception ex)
@@ -182,13 +208,16 @@ namespace InferenceEngine
 #if DEBUG
                         Console.ReadLine(); //stops the console from closing
 #endif
-                        return 2;
+                        return 4;
                 }
             }
             catch(System.Exception ex)
             {
                 Console.WriteLine("ERROR: {0}", ex.Message);
-                return 4;
+#if DEBUG
+                Console.ReadLine(); //stops the console from closing
+#endif
+                return 5;
             }
 
             if (result.Success)

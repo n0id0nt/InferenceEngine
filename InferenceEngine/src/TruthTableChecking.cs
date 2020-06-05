@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Diagnostics;
 
 namespace InferenceEngine
 {
@@ -10,7 +11,10 @@ namespace InferenceEngine
     {
         static public Result TT(KnowledgeBase knowledgeBase, string query)
         {
-            return TTCheckAll(knowledgeBase, query, knowledgeBase.Symbols, new Dictionary<string, bool> { { "", false } });
+            Result result = TTCheckAll(knowledgeBase, query, knowledgeBase.Symbols, new Dictionary<string, bool> { { "", true } });
+            if (result.Count == 0)
+                result.Success = false;
+            return result;
         }
 
         static private Result TTCheckAll(KnowledgeBase knowledgeBase, string query, List<string> symbols, Dictionary<string, bool> model)
@@ -19,8 +23,7 @@ namespace InferenceEngine
             {
                 if (PLTrue(knowledgeBase, model))
                 {
-                    bool result = PLTrue(new KnowledgeBase(query), model);
-                    return new Result(result, count: 1);
+                    return new Result((model.Keys.Contains(query))? model[query]: false, count: 1);
                 }
                 else
                 {
@@ -33,8 +36,8 @@ namespace InferenceEngine
                 string first = symbolsCopy[0];
                 symbolsCopy.RemoveAt(0);
 
-                Dictionary<string, bool> t = model.ToDictionary(m => m.Key, m => m.Value);
-                Dictionary<string, bool> f = model.ToDictionary(m => m.Key, m => m.Value);
+                Dictionary<string, bool> t = new Dictionary<string, bool>(model);
+                Dictionary<string, bool> f = new Dictionary<string, bool>(model);
 
                 t.Add(first, true);
                 f.Add(first, false);
@@ -47,32 +50,33 @@ namespace InferenceEngine
 
         static private bool PLTrue(KnowledgeBase knowledgeBase, Dictionary<string, bool> model)
         {
-            bool result = true;
-            foreach(Senctence Senctence in knowledgeBase.Sentences)
+            
+            foreach(Sentence Sentence in knowledgeBase.Sentences)
             {
-                bool innerResult = model[Senctence.Symbols[0]];
-
-                for (int i = 0; i < Senctence.Symbols.Count - 1; i++)
+                List<bool> bSymbols = Sentence.Symbols.ConvertAll(s => model[s]);
+                List<string> logicalSymbols = new List<string>(Sentence.LogicalConnectives);
+                    
+                // loops through Symbols in the order of operation
+                foreach (string s in LogicalConnectives.SymbolsOperationOrder)
                 {
-                    innerResult = Evaluate(ref i, innerResult, Senctence, model);
+                    // set the firts occurance of the symbol to i
+                    int i;
+                    while ((i = logicalSymbols.LastIndexOf(s)) != -1)
+                    {
+                        bSymbols[i] = LogicalConnectives.Evaluate(s, bSymbols[i], bSymbols[i + 1]);
+
+                        // remove evaluated symbols
+                        bSymbols.RemoveAt(i + 1);
+                        logicalSymbols.RemoveAt(i);
+                    }
                 }
 
-                result &= innerResult;
-            }
-            return result;
-        }
+                Debug.Assert(bSymbols.Count == 1);
 
-        static private bool Evaluate(ref int index, bool result, Senctence Senctence, Dictionary<string, bool> model)
-        {
-            if (Senctence.Symbols[index + 1] == "") // means not symbol
-            {
-                result = LogicalConnectives.Evaluate(Senctence.LogicalConnectives[index++], result, Evaluate(ref index, result, Senctence, model));
+                if (!bSymbols[0])
+                    return false;
             }
-            else
-            {
-                result = LogicalConnectives.Evaluate(Senctence.LogicalConnectives[index], result, model[Senctence.Symbols[index + 1]]);
-            }
-            return result;
+            return true;
         }
     }
 }

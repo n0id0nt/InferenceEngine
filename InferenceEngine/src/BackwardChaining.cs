@@ -10,34 +10,55 @@ namespace InferenceEngine
     {
         static public Result BC(KnowledgeBase knowledgeBase, string query)
         {
-            if (!knowledgeBase.IsHornSenctence)
+            if (!knowledgeBase.IsHornClause)
             {
-                throw new Exception("KnowledgeBase must be Horn Senctence");
+                throw new Exception("KnowledgeBase must be Horn Clause");
             }
-            return BCRecursive(knowledgeBase, query);
+            List<string> symbolsEnailed = new List<string>();
+
+            short result = BCRecursive(knowledgeBase, query, new List<Sentence>(), ref symbolsEnailed);
+
+            if (result == 1)
+                return new Result(true, symbols: symbolsEnailed);
+            else
+                return new Result(false);
         }
 
-        static private Result BCRecursive(KnowledgeBase knowledgeBase, string target)
+        static private short BCRecursive(KnowledgeBase knowledgeBase, string target, List<Sentence> sentencesChecked, ref List<string> symbolsEntailed)
         {
-            List<Senctence> statements = knowledgeBase.InConclusion(target);
-            List<string> symbolsEntailed = new List<string>();
-            List<bool> results = new List<bool>();
-            foreach (Senctence c in statements)
+            List<Sentence> statements = knowledgeBase.InConclusion(target);
+            short results = 0;
+            foreach (Sentence c in statements)
             {
-                bool result = true;
-                foreach (string s in c.Premise)
+                if (!sentencesChecked.Contains(c))
                 {
-                    Result r = BCRecursive(knowledgeBase, s);
-                    result &= r.Success;
-                    if (r.Success)
-                        symbolsEntailed = r.Symbols;
+                    sentencesChecked.Add(c);
+                    short result = 1;
+                    foreach (string s in c.Premise)
+                    {
+                        List<Sentence> sentencesCheckedCopy = new List<Sentence>(sentencesChecked);
+                        short r = BCRecursive(knowledgeBase, s, sentencesCheckedCopy, ref symbolsEntailed);
+
+                        result = r;
+
+                        if (r != 1)
+                        {
+                            break; // can break out of loop cause all statements must be true
+                        }
+                    }
+
+                    if (!symbolsEntailed.Contains(c.Conclusion))
+                        symbolsEntailed.Add(c.Conclusion);
+
+                    if (result != 0)
+                        results = result;
+                    else
+                        break;
                 }
-                results.Add(result);
-                if (!symbolsEntailed.Contains(c.Conclusion))
-                    symbolsEntailed.Add(c.Conclusion);
+                else if (results == 0) results = -1; // to indicate overflow on branch so no inference can be drawn from it
             }
 
-            return new Result(results.All(r => r) && results.Count != 0, symbols: symbolsEntailed);
+            return results;
         }
     }
 }

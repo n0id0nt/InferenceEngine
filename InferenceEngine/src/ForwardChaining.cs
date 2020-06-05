@@ -10,13 +10,13 @@ namespace InferenceEngine
     {
         static public Result FC(KnowledgeBase knowledgeBase, string query)
         {
-            if (!knowledgeBase.IsHornSenctence)
+            if (!knowledgeBase.IsHornClause)
             {
-                throw new Exception("KnowledgeBase must be Horn Senctence");
+                throw new Exception("KnowledgeBase must be Horn Clause");
             }
             // count <- a table where count[c] is the number of symbols in c's premis
-            Dictionary<Senctence, int> count = new Dictionary<Senctence, int>();
-            foreach (Senctence c in knowledgeBase.Sentences)
+            Dictionary<Sentence, int> count = new Dictionary<Sentence, int>();
+            foreach (Sentence c in knowledgeBase.Sentences)
             {
                 count.Add(c, c.Premise.Count);
             }
@@ -28,7 +28,7 @@ namespace InferenceEngine
                 inferred.Add(s, false);
             }
 
-            // agenda <- a queue of sumbols, initially symbols known to be true in KB
+            // agenda <- a queue of symbols, initially symbols known to be true in KB
             Queue<string> agenda = knowledgeBase.InitiallyTrue();
 
             List<string> symbolsEntailed = new List<string>();
@@ -48,11 +48,11 @@ namespace InferenceEngine
                 {
                     // inferred[p] <- true
                     inferred[p] = true;
-                    // for each Senctence c in KB where p is in c.Premise do
-                    foreach (Senctence c in knowledgeBase.InPremise(p))
+                    // for each Sentence c in KB where p is in c.Premise do
+                    foreach (Sentence c in knowledgeBase.InPremise(p))
                     {
-                        // decrement count[c]
-                        count[c]--;
+                        // decrement count[c] by the items frequency in list
+                        count[c] -= c.Premise.FindAll(i => i.Equals(p)).Count;
                         // if count[c] = 0 than add c.Conclusion to agenda
                         if (count[c] == 0)
                             agenda.Enqueue(c.Conclusion);     

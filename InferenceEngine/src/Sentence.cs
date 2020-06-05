@@ -7,49 +7,49 @@ using System.Threading.Tasks;
 
 namespace InferenceEngine
 {
-    class Senctence
+    class Sentence
     {
         public List<string> Symbols { get; private set; }
 
         public List<string> LogicalConnectives { get; private set; }
 
-        public bool IsHornSenctence { get; }
+        public bool IsHornClause { get; }
 
         public List<string> Premise { get; private set; }
 
         public string Conclusion { get; private set; }
 
-        public Senctence(List<string> symbols, List<string> logicalConnectives)
+        public Sentence(List<string> symbols, List<string> logicalConnectives)
         {
             Symbols = symbols;
             LogicalConnectives = logicalConnectives;
 
             Debug.Assert(symbols.Count == logicalConnectives.Count + 1);
 
-            IsHornSenctence = false;
+            IsHornClause = false;
             Premise = null;
             Conclusion = null;
 
-            // test if horn Senctence
+            // test if horn Sentence
             if (LogicalConnectives.Count == 0)
             {
-                IsHornSenctence = true;
+                IsHornClause = true;
                 Conclusion = Symbols[0];
                 Premise = new List<string>();
             }
             else if (LogicalConnectives.Last() == "=>")
             {
-                IsHornSenctence = true;
-                for (UInt16 i = 0; i < LogicalConnectives.Count - 1; i++)
+                IsHornClause = true;
+                for (int i = 0; i < LogicalConnectives.Count - 1; i++)
                 {
                     if (!LogicalConnectives[i].Equals("&"))
                     {
-                        IsHornSenctence = false;
+                        IsHornClause = false;
                         break;
                     }
                 }
 
-                if (IsHornSenctence)
+                if (IsHornClause)
                 {
                     Conclusion = Symbols.Last();
                     Premise = symbols.ConvertAll(symbol => String.Copy(symbol));

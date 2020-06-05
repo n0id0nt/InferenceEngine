@@ -1,4 +1,5 @@
 TELL
 c&e=>f; f=>g; ch&s=>ca; ca=>y; c; e;
 ASK
-g
+z
+

@@ -10,8 +10,16 @@ namespace InferenceEngine
     {
         public static string[] Symbols { get
             {
-                return new string[] { "~", "&", "||", "<=>", "=>" };
+                return new string[] { "~", "&", "||", "<=>", "=>" }; // order of this list is important so => is not found before <=> when parsing file
             } }
+
+        public static string[] SymbolsOperationOrder
+        {
+            get
+            {
+                return new string[] { "~", "&", "||", "=>", "<=>" };
+            }
+        }
 
         public static bool Evaluate(string connector, bool left, bool right)
         {

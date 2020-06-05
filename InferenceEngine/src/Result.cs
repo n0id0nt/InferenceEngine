@@ -8,7 +8,7 @@ namespace InferenceEngine
 {
     class Result
     {
-        public bool Success { get; }
+        public bool Success { get; set; }
 
         public List<string> Symbols { get; }
 
