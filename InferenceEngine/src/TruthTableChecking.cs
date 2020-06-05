@@ -61,7 +61,8 @@ namespace InferenceEngine
                 {
                     // set the firts occurance of the symbol to i
                     int i;
-                    while ((i = logicalSymbols.LastIndexOf(s)) != -1)
+                    // will check from back to front for not statements to handel double negetives
+                    while ((i = (s == "~")?logicalSymbols.LastIndexOf(s): logicalSymbols.IndexOf(s)) != -1) 
                     {
                         bSymbols[i] = LogicalConnectives.Evaluate(s, bSymbols[i], bSymbols[i + 1]);
 
